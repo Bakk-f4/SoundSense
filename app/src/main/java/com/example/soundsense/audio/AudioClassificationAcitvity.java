@@ -63,7 +63,13 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 for (Classifications classifications : output){
                     for (Category category : classifications.getCategories()){
                         //if score is higher than 30% possibility...
-                        if(category.getScore() > 0.3f){
+                        if(category.getScore() > 0.3f && category.getLabel().equals("Dog")){
+                            finalOutput.add(category);
+                        }
+                        if(category.getScore() > 0.3f && category.getLabel().equals("Speech")){
+                            finalOutput.add(category);
+                        }
+                        if(category.getScore() > 0.3f && category.getLabel().equals("Bark")){
                             finalOutput.add(category);
                         }
                     }
@@ -76,7 +82,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                             .append(": ").append(category.getScore()).append("\n");
                     Log.i(TAG, outputStr.toString());
                 }
-                Log.d("Audio", "classify list size: " + finalOutput.size());
+                // Log.d("Audio", "classify list size: " + finalOutput.size());
 
                 //updating the textView for output
                 runOnUiThread(new Runnable() {
