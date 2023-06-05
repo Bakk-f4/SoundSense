@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.example.soundsense.helpers.AudioHelperActivity;
+import com.example.soundsense.helpers.MailSender;
 
 import org.tensorflow.lite.support.audio.TensorAudio;
 import org.tensorflow.lite.support.label.Category;
@@ -26,10 +27,14 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private TimerTask timerTask;
     private AudioClassifier audioClassifier;
     private TensorAudio tensorAudio;
+    private MailSender mailsender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mailsender = new MailSender();
+
 
         //inizialize audioClassifier from TF model
         try {
@@ -65,6 +70,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                         //if score is higher than 30% possibility...
                         if(category.getScore() > 0.3f && category.getLabel().equals("Dog")){
                             finalOutput.add(category);
+                            mailsender.sendMail("rico.88@hotmail.it", "wweweeee il perro ha parlato");
                         }
                         if(category.getScore() > 0.3f && category.getLabel().equals("Speech")){
                             finalOutput.add(category);
