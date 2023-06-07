@@ -5,19 +5,20 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.example.soundsense.helpers.AudioHelperActivity;
+
+import org.tensorflow.lite.support.audio.TensorAudio;
+import org.tensorflow.lite.support.label.Category;
+import org.tensorflow.lite.task.audio.classifier.AudioClassifier;
+import org.tensorflow.lite.task.audio.classifier.Classifications;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.example.soundsense.helpers.AudioHelperActivity;
-import com.example.soundsense.helpers.MailSender;
-
-import org.tensorflow.lite.support.audio.TensorAudio;
-import org.tensorflow.lite.support.label.Category;
-import org.tensorflow.lite.task.audio.classifier.AudioClassifier;
-import org.tensorflow.lite.task.audio.classifier.Classifications;
+import papaya.in.sendmail.SendMail;
 
 public class AudioClassificationAcitvity extends AudioHelperActivity {
 
@@ -27,14 +28,10 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private TimerTask timerTask;
     private AudioClassifier audioClassifier;
     private TensorAudio tensorAudio;
-    private MailSender mailsender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mailsender = new MailSender();
-
 
         //inizialize audioClassifier from TF model
         try {
@@ -57,6 +54,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord = audioClassifier.createAudioRecord();
         audioRecord.startRecording();
 
+
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -70,7 +68,13 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                         //if score is higher than 30% possibility...
                         if(category.getScore() > 0.3f && category.getLabel().equals("Dog")){
                             finalOutput.add(category);
-                            mailsender.sendMail("rico.88@hotmail.it", "wweweeee il perro ha parlato");
+                            sendEmail("ion.menghini@gmail.com",
+                                    "Testing Email Sending",
+                                    "Yes, it's working well\nI will use it always.");
+                            // TODO AGGIUNGERE TIMEOUT DI INVIO
+                            // TODO AGGIUNGERE PAGINA SETTING DA COMPILARE OBBLIGATORIAMENTE
+                            //  ( tasto Start nn funziona (se disabilitato Toast di avviso ) )
+                            //  si vedra'
                         }
                         if(category.getScore() > 0.3f && category.getLabel().equals("Speech")){
                             finalOutput.add(category);
@@ -88,7 +92,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                             .append(": ").append(category.getScore()).append("\n");
                     Log.i(TAG, outputStr.toString());
                 }
-                // Log.d("Audio", "classify list size: " + finalOutput.size());
 
                 //updating the textView for output
                 runOnUiThread(new Runnable() {
@@ -110,6 +113,17 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         super.stopRecording(view);
         timerTask.cancel();
         audioRecord.stop();
+    }
+
+    public void sendEmail(String sendTo, String subject, String message){
+        SendMail mail = new SendMail(
+                "gruppo.cinque.webd@gmail.com",
+                "daugjanscvsqdrab",
+                sendTo,
+                subject,
+                message
+        );
+        mail.execute();
     }
 
 }

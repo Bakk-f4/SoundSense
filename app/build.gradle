@@ -26,6 +26,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     packagingOptions{
         exclude 'META-INF/NOTICE.md'
         exclude 'META-INF/LICENSE.md'
@@ -42,7 +43,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     // Import the Audio Task Library dependency (NNAPI is included)
     implementation 'org.tensorflow:tensorflow-lite-task-audio:0.4.0'
-
-    implementation 'com.sun.mail:android-mail:1.6.6'
-    implementation 'com.sun.mail:android-activation:1.6.7'
+    //testing email library
+    implementation 'com.github.1902shubh:SendMail:1.0.0'
 }
