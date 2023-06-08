@@ -3,6 +3,7 @@ package com.example.soundsense.audio;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioRecord;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -38,22 +40,30 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     //var per temporizzare l' invio delle email
     private long lastCallTime = 0;
     private static final long FIVE_MINUTES = 5 * 60 * 1000; // 5 minuti in millisecondi
+
+    //TODO aggiornare il valore dei secondi dal shared preferences
+    //TODO completare parte grafica per la selezione delle categorie
     private String objectOfAudio;
     private String objectOfAudioPrecedente = "";
     private String emailTo;
+    private HashMap<String, Long> userClassification;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-
-
         super.onCreate(savedInstanceState);
 
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         emailTo = sharedPreferences.getString("email", "");
+
+
+        userClassification = new HashMap<String, Long>();
+        userClassification.put("Dog", 0L);
+        userClassification.put("Speech", 0L);
+        userClassification.put("Clapping", 0L);
+
+
 
         //inizialize audioClassifier from TF model
         try {
@@ -82,32 +92,25 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 tensorAudio.load(audioRecord);
                 List<Classifications> output = audioClassifier.classify(tensorAudio);
 
+
+                String categoryLabel;
+
                 //filtering out classifications with low probability
                 List<Category> finalOutput = new ArrayList<>();
                 for (Classifications classifications : output){
                     for (Category category : classifications.getCategories()){
                         //if score is higher than 30% possibility...
+                        categoryLabel = category.getLabel();
                         //TODO potremmo usare un array creato dall' utente per le categorie
-                        if(category.getScore() > 0.3f && category.getLabel().equals("Dog")){
+                        if(category.getScore() > 0.3f && userClassification.get(categoryLabel)!=null){
                             finalOutput.add(category);
-                            objectOfAudio = "Dog";
+                            objectOfAudio = categoryLabel;
                             sendEmail(emailTo,
-                                    "DOG",
+                                    categoryLabel,
                                     "Yes, it's working well\nI will use it always.",
                                     objectOfAudio );
                             // TODO AGGIUNGERE PAGINA SETTING DA COMPILARE
                             //  ( tasto Start nn funziona (se disabilitato Toast di avviso ) )
-                        }
-                        if(category.getScore() > 0.3f && category.getLabel().equals("Speech")){
-                            finalOutput.add(category);
-                            objectOfAudio = "Speech";
-                            sendEmail(emailTo,
-                                    "SPEECH",
-                                    "Yes, it's working well\nI will use it always.",
-                                    objectOfAudio );
-                        }
-                        if(category.getScore() > 0.3f && category.getLabel().equals("Bark")){
-                            finalOutput.add(category);
                         }
                     }
                 }
@@ -144,11 +147,8 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
 
     public void sendEmail(String sendTo, String subject, String message, String ActualobjectAudio){
 
-        //TODO Qui potremmo usare una key,value
-        //  per verificare gli ultimi valori come categoria e tempo
-
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastCallTime > FIVE_MINUTES || objectOfAudioPrecedente != ActualobjectAudio) {
+        if ((currentTime - userClassification.get(subject)) > FIVE_MINUTES) {
             SendMail mail = new SendMail(
                     "gruppo.cinque.webd@gmail.com",
                     "daugjanscvsqdrab",
@@ -158,11 +158,18 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
             );
             mail.execute();
             // Aggiorna il tempo dell'ultima chiamata
-            lastCallTime = currentTime;
-            objectOfAudioPrecedente = ActualobjectAudio;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Log.i("valore timestamp prima: ", userClassification.get(subject)+"");
+
+                userClassification.replace(subject, currentTime);
+            }
+
+
         } else {
             // La funzione non può essere chiamata perché sono passati meno di 5 minuti
             Log.i(TAG, "EMAIL TIMEOUT NON ANCORA TERMINATO");
+            Log.i(TAG, (currentTime - userClassification.get(subject)+1000 > FIVE_MINUTES) +"");
+
         }
     }
 
