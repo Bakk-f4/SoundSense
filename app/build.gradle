@@ -45,4 +45,5 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite-task-audio:0.4.0'
     //testing email library
     implementation 'com.github.1902shubh:SendMail:1.0.0'
+
 }

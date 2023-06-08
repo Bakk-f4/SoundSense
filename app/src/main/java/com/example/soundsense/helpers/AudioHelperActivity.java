@@ -2,15 +2,18 @@ package com.example.soundsense.helpers;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.Manifest;
 
 import com.example.soundsense.R;
+import com.example.soundsense.audio.AudioClassificationAcitvity;
 
 public class AudioHelperActivity extends AppCompatActivity {
 
@@ -18,6 +21,8 @@ public class AudioHelperActivity extends AppCompatActivity {
     protected TextView tvSpecs;
     protected Button bttStartRecording;
     protected Button bttStopRecording;
+    protected ImageButton bttSettings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +33,7 @@ public class AudioHelperActivity extends AppCompatActivity {
         tvSpecs = findViewById(R.id.tvAudioSpecs);
         bttStartRecording = findViewById(R.id.bttStartRecording);
         bttStopRecording = findViewById(R.id.bttStopRecording);
+        bttSettings = findViewById(R.id.bttSettings);
 
         //disable stop recording at start of the activity
         bttStopRecording.setEnabled(false);
@@ -48,5 +54,11 @@ public class AudioHelperActivity extends AppCompatActivity {
     public void stopRecording(View view){
         bttStartRecording.setEnabled(true);
         bttStopRecording.setEnabled(false);
+    }
+
+    public void onGoToSettings(View view){
+        // start the audio helper activity
+        Intent intent = new Intent(this, InputDataActivity.class);
+        startActivity(intent);
     }
 }

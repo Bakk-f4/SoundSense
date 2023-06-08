@@ -19,6 +19,8 @@
         <activity
             android:name=".audio.AudioClassificationAcitvity"/>
         <activity
+            android:name=".helpers.InputDataActivity"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

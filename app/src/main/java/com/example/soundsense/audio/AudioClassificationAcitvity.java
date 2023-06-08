@@ -1,9 +1,12 @@
 package com.example.soundsense.audio;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioRecord;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.example.soundsense.helpers.AudioHelperActivity;
 
@@ -37,10 +40,20 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private static final long FIVE_MINUTES = 5 * 60 * 1000; // 5 minuti in millisecondi
     private String objectOfAudio;
     private String objectOfAudioPrecedente = "";
+    private String emailTo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
+
         super.onCreate(savedInstanceState);
+
+
+        SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        emailTo = sharedPreferences.getString("email", "");
 
         //inizialize audioClassifier from TF model
         try {
@@ -78,7 +91,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                         if(category.getScore() > 0.3f && category.getLabel().equals("Dog")){
                             finalOutput.add(category);
                             objectOfAudio = "Dog";
-                            sendEmail("ion.menghini@gmail.com",
+                            sendEmail(emailTo,
                                     "DOG",
                                     "Yes, it's working well\nI will use it always.",
                                     objectOfAudio );
@@ -88,7 +101,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                         if(category.getScore() > 0.3f && category.getLabel().equals("Speech")){
                             finalOutput.add(category);
                             objectOfAudio = "Speech";
-                            sendEmail("ion.menghini@gmail.com",
+                            sendEmail(emailTo,
                                     "SPEECH",
                                     "Yes, it's working well\nI will use it always.",
                                     objectOfAudio );
