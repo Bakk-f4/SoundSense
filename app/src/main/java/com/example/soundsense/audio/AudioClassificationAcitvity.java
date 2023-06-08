@@ -13,8 +13,12 @@ import org.tensorflow.lite.task.audio.classifier.AudioClassifier;
 import org.tensorflow.lite.task.audio.classifier.Classifications;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,6 +32,11 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private TimerTask timerTask;
     private AudioClassifier audioClassifier;
     private TensorAudio tensorAudio;
+    //var per temporizzare l' invio delle email
+    private long lastCallTime = 0;
+    private static final long FIVE_MINUTES = 5 * 60 * 1000; // 5 minuti in millisecondi
+    private String objectOfAudio;
+    private String objectOfAudioPrecedente = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +63,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord = audioClassifier.createAudioRecord();
         audioRecord.startRecording();
 
-
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -66,18 +74,24 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 for (Classifications classifications : output){
                     for (Category category : classifications.getCategories()){
                         //if score is higher than 30% possibility...
+                        //TODO potremmo usare un array creato dall' utente per le categorie
                         if(category.getScore() > 0.3f && category.getLabel().equals("Dog")){
                             finalOutput.add(category);
+                            objectOfAudio = "Dog";
                             sendEmail("ion.menghini@gmail.com",
-                                    "Testing Email Sending",
-                                    "Yes, it's working well\nI will use it always.");
-                            // TODO AGGIUNGERE TIMEOUT DI INVIO
-                            // TODO AGGIUNGERE PAGINA SETTING DA COMPILARE OBBLIGATORIAMENTE
+                                    "DOG",
+                                    "Yes, it's working well\nI will use it always.",
+                                    objectOfAudio );
+                            // TODO AGGIUNGERE PAGINA SETTING DA COMPILARE
                             //  ( tasto Start nn funziona (se disabilitato Toast di avviso ) )
-                            //  si vedra'
                         }
                         if(category.getScore() > 0.3f && category.getLabel().equals("Speech")){
                             finalOutput.add(category);
+                            objectOfAudio = "Speech";
+                            sendEmail("ion.menghini@gmail.com",
+                                    "SPEECH",
+                                    "Yes, it's working well\nI will use it always.",
+                                    objectOfAudio );
                         }
                         if(category.getScore() > 0.3f && category.getLabel().equals("Bark")){
                             finalOutput.add(category);
@@ -89,7 +103,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 StringBuilder outputStr = new StringBuilder();
                 for(Category category : finalOutput){
                     outputStr.append(category.getLabel())
-                            .append(": ").append(category.getScore()).append("\n");
+                            .append(": ").append(getCurrentDateTime()).append("\n");
                     Log.i(TAG, outputStr.toString());
                 }
 
@@ -115,15 +129,33 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord.stop();
     }
 
-    public void sendEmail(String sendTo, String subject, String message){
-        SendMail mail = new SendMail(
-                "gruppo.cinque.webd@gmail.com",
-                "daugjanscvsqdrab",
-                sendTo,
-                subject,
-                message
-        );
-        mail.execute();
+    public void sendEmail(String sendTo, String subject, String message, String ActualobjectAudio){
+
+        //TODO Qui potremmo usare una key,value
+        //  per verificare gli ultimi valori come categoria e tempo
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastCallTime > FIVE_MINUTES || objectOfAudioPrecedente != ActualobjectAudio) {
+            SendMail mail = new SendMail(
+                    "gruppo.cinque.webd@gmail.com",
+                    "daugjanscvsqdrab",
+                    sendTo,
+                    subject,
+                    message
+            );
+            mail.execute();
+            // Aggiorna il tempo dell'ultima chiamata
+            lastCallTime = currentTime;
+            objectOfAudioPrecedente = ActualobjectAudio;
+        } else {
+            // La funzione non può essere chiamata perché sono passati meno di 5 minuti
+            Log.i(TAG, "EMAIL TIMEOUT NON ANCORA TERMINATO");
+        }
     }
 
+    public String getCurrentDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
 }
