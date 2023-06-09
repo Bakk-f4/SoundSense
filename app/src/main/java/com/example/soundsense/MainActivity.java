@@ -6,14 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.soundsense.audio.AudioClassificationAcitvity;
-import com.example.soundsense.helpers.AudioHelperActivity;
-import com.example.soundsense.helpers.InputDataActivity;
+import com.example.soundsense.helpers.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             Toast.makeText(this, "You must set your email before use the app!", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, InputDataActivity.class);
+            Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
 

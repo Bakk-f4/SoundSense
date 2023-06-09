@@ -19,7 +19,7 @@
         <activity
             android:name=".audio.AudioClassificationAcitvity"/>
         <activity
-            android:name=".helpers.InputDataActivity"/>
+            android:name=".helpers.SettingsActivity"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

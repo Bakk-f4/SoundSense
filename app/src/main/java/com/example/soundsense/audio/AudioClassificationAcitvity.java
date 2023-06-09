@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import com.example.soundsense.helpers.AudioHelperActivity;
 
@@ -39,31 +38,26 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private TensorAudio tensorAudio;
     //var per temporizzare l' invio delle email
     private long lastCallTime = 0;
-    private static final long FIVE_MINUTES = 5 * 60 * 1000; // 5 minuti in millisecondi
+    private static long MINUTES = 60 * 1000; // 5 minuti in millisecondi
 
-    //TODO aggiornare il valore dei secondi dal shared preferences
     //TODO completare parte grafica per la selezione delle categorie
     private String objectOfAudio;
     private String objectOfAudioPrecedente = "";
     private String emailTo;
     private HashMap<String, Long> userClassification;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         emailTo = sharedPreferences.getString("email", "");
-
+        MINUTES *= Integer.parseInt(sharedPreferences.getString("timeout", "1"));
 
         userClassification = new HashMap<String, Long>();
         userClassification.put("Dog", 0L);
         userClassification.put("Speech", 0L);
         userClassification.put("Clapping", 0L);
-
-
 
         //inizialize audioClassifier from TF model
         try {
@@ -92,7 +86,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 tensorAudio.load(audioRecord);
                 List<Classifications> output = audioClassifier.classify(tensorAudio);
 
-
                 String categoryLabel;
 
                 //filtering out classifications with low probability
@@ -107,10 +100,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                             objectOfAudio = categoryLabel;
                             sendEmail(emailTo,
                                     categoryLabel,
-                                    "Yes, it's working well\nI will use it always.",
-                                    objectOfAudio );
-                            // TODO AGGIUNGERE PAGINA SETTING DA COMPILARE
-                            //  ( tasto Start nn funziona (se disabilitato Toast di avviso ) )
+                                    "Yes, it's working well\nI will use it always.");
                         }
                     }
                 }
@@ -145,10 +135,10 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord.stop();
     }
 
-    public void sendEmail(String sendTo, String subject, String message, String ActualobjectAudio){
+    public void sendEmail(String sendTo, String subject, String message){
 
         long currentTime = System.currentTimeMillis();
-        if ((currentTime - userClassification.get(subject)) > FIVE_MINUTES) {
+        if ((currentTime - userClassification.get(subject)) > MINUTES) {
             SendMail mail = new SendMail(
                     "gruppo.cinque.webd@gmail.com",
                     "daugjanscvsqdrab",
@@ -168,7 +158,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         } else {
             // La funzione non può essere chiamata perché sono passati meno di 5 minuti
             Log.i(TAG, "EMAIL TIMEOUT NON ANCORA TERMINATO");
-            Log.i(TAG, (currentTime - userClassification.get(subject)+1000 > FIVE_MINUTES) +"");
+            Log.i(TAG, (currentTime - userClassification.get(subject) > MINUTES) +"");
 
         }
     }

@@ -1,7 +1,6 @@
 package com.example.soundsense.helpers;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -10,10 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.Manifest;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.soundsense.R;
-import com.example.soundsense.audio.AudioClassificationAcitvity;
 
 public class AudioHelperActivity extends AppCompatActivity {
 
@@ -58,7 +57,7 @@ public class AudioHelperActivity extends AppCompatActivity {
 
     public void onGoToSettings(View view){
         // start the audio helper activity
-        Intent intent = new Intent(this, InputDataActivity.class);
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 }
