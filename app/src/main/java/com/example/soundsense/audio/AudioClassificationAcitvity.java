@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.soundsense.helpers.AudioHelperActivity;
+import com.example.soundsense.helpers.SettingsActivity;
 
 import org.tensorflow.lite.support.audio.TensorAudio;
 import org.tensorflow.lite.support.label.Category;
@@ -40,9 +41,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private long lastCallTime = 0;
     private static long MINUTES = 60 * 1000; // 5 minuti in millisecondi
 
-    //TODO completare parte grafica per la selezione delle categorie
     private String objectOfAudio;
-    private String objectOfAudioPrecedente = "";
     private String emailTo;
     private HashMap<String, Long> userClassification;
 
@@ -55,9 +54,12 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         MINUTES *= Integer.parseInt(sharedPreferences.getString("timeout", "1"));
 
         userClassification = new HashMap<String, Long>();
-        userClassification.put("Dog", 0L);
-        userClassification.put("Speech", 0L);
-        userClassification.put("Clapping", 0L);
+        SettingsActivity settingsActivity = new SettingsActivity();
+        ArrayList<String> finalList = settingsActivity.getFinalListCategory();
+        for (String item : finalList) {
+            Log.i("FinalListCategory", item);
+            userClassification.put(item, 0L);
+        }
 
         //inizialize audioClassifier from TF model
         try {
@@ -94,7 +96,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                     for (Category category : classifications.getCategories()){
                         //if score is higher than 30% possibility...
                         categoryLabel = category.getLabel();
-                        //TODO potremmo usare un array creato dall' utente per le categorie
                         if(category.getScore() > 0.3f && userClassification.get(categoryLabel)!=null){
                             finalOutput.add(category);
                             objectOfAudio = categoryLabel;
