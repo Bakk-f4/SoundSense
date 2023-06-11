@@ -47,35 +47,98 @@ public class SettingsActivity extends AppCompatActivity {
     private ArrayList<String> yamnetClassList = new ArrayList<>();
 
 
-
+    //TODO CAMBIARE L USO DELLE LISTE, USARE SOLO JSONARRAY AL POSTO DI finalListCategory
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        //get all classification from yamnet.json file
-        String[] yamnetClassArray = fromJSONToArray("yamnet_class_map.json");
-        yamnetClassList.addAll(Arrays.asList(yamnetClassArray));
-        Collections.sort(yamnetClassList);
+        //initialize UI objects
+        editTextEmail = findViewById(R.id.editTextEmail);
+        editTextName = findViewById(R.id.editTextName);
+        editTextSurname = findViewById(R.id.editTextSurname);
+        editTextTimeout = findViewById(R.id.editTextTimeOutEmail);
+        buttonSubmit = findViewById(R.id.buttonSubmit);
+        buttonReset = findViewById(R.id.bttReset);
 
-        //TODO memorizzare lista di categorie su shared preference
+        //load data from sharedPreference
+        sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
 
+        String loadedYamnetFromSharedPref = sharedPreferences.getString("allYamnetCategories", "");
+
+        //check if we didnt loaded already yamnet categories
+        if(loadedYamnetFromSharedPref.equals("")){
+            //get all classification from yamnet.json file
+            String[] yamnetClassArray = fromJSONToArray("short_yamnet_class_map.json");
+            yamnetClassList.addAll(Arrays.asList(yamnetClassArray));
+            Collections.sort(yamnetClassList);
+
+            //preparing data for sharedPreference
+            JSONArray jsonArray = new JSONArray(yamnetClassList);
+            String arrayString = jsonArray.toString();
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("allYamnetCategories", arrayString);
+            editor.apply();
+        } else {
+            try {
+                // Converti la stringa dell'array in un JSONArray
+                JSONArray savedJsonArray = new JSONArray(loadedYamnetFromSharedPref);
+                Log.i("savedJsonArray", savedJsonArray.toString());
+
+                //per ogni elemento in savedJsonArray
+                for (int i = 0; i < savedJsonArray.length(); i++) {
+                    yamnetClassList.add(savedJsonArray.getString(i));
+                    Log.i("YAMNETELSE", savedJsonArray.getString(i));
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //se esistono sharedPreference gategory
+        if(!sharedPreferences.getString("UserCategories", "").equals("")){
+            //se troviamo usercategory allora carichiamo questo
+        }
+
+        //load the data from yamnetClassList into the Spinner
         Spinner spinner = findViewById(R.id.spinnerCategory);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, yamnetClassList);
         spinner.setAdapter(adapter);
+
+        //on user selection item from spinner
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (id != 0) {
+                    // Rimuovi l'elemento dalla lista temporanea
                     String selectedItem = (String) parent.getItemAtPosition(position);
-                    Log.i("selectedItem", selectedItem);
-                    yamnetClassList.remove(selectedItem);  // Rimuovi l'elemento dalla lista temporanea
+                    yamnetClassList.remove(selectedItem);
 
+                    //preparing data for sharedPreference
+                    JSONArray jsonArray = new JSONArray(yamnetClassList);
+                    String arrayString = jsonArray.toString();
+
+                    //removing the element from the sharedPreference allYamnetCategories
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("allYamnetCategories", arrayString);
+                    editor.apply();
+
+                    // Imposta il nuovo adapter
                     ArrayAdapter<String> newAdapter = new ArrayAdapter<>(SettingsActivity.this, android.R.layout.simple_spinner_dropdown_item, yamnetClassList);
-                    spinner.setAdapter(newAdapter);  // Imposta il nuovo adapter
+                    spinner.setAdapter(newAdapter);
 
-                    finalListCategory.add(selectedItem);  // Aggiungi l'elemento alla lista "finalListCategory"
+                    // Aggiungi l'elemento alla lista "finalListCategory"
+                    finalListCategory.add(selectedItem);
+
+                    //inseriamo finalListCategory alle sharedPreference
+                    jsonArray = new JSONArray(finalListCategory);
+                    arrayString = jsonArray.toString();
+                    editor = sharedPreferences.edit();
+                    editor.putString("UserCategories", arrayString);
+                    editor.apply();
                 }
             }
 
@@ -85,25 +148,18 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-
-        sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
-        editTextEmail = findViewById(R.id.editTextEmail);
-        editTextName = findViewById(R.id.editTextName);
-        editTextSurname = findViewById(R.id.editTextSurname);
-        editTextTimeout = findViewById(R.id.editTextTimeOutEmail);
-        buttonSubmit = findViewById(R.id.buttonSubmit);
-        buttonReset = findViewById(R.id.bttReset);
-
-        sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        //update the UI objects
         email = sharedPreferences.getString("email", "");
         name = sharedPreferences.getString("name", "");
         surname = sharedPreferences.getString("surname", "");
         timeout = sharedPreferences.getString("timeout", "");
-
         editTextEmail.setText(email);
         editTextName.setText(name);
         editTextSurname.setText(surname);
         editTextTimeout.setText(timeout);
+
+
+        //when user send the input data with buttonSubmit
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,22 +192,17 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        //when user use reset button
         buttonReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //TODO AGGIORNARE LA LOGICA RESET CON SHARED PREFERENCE
                 yamnetClassList.addAll(finalListCategory);
                 Collections.sort(yamnetClassList);
                 finalListCategory.clear();
-
             }
-
         });
-
-
-
-
     }
-
     
     public void onGoToAudioClassificationActivity(View view){
         // start the audio helper activity

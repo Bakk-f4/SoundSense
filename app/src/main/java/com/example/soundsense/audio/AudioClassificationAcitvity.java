@@ -9,8 +9,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.soundsense.helpers.AudioHelperActivity;
-import com.example.soundsense.helpers.SettingsActivity;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.tensorflow.lite.support.audio.TensorAudio;
 import org.tensorflow.lite.support.label.Category;
 import org.tensorflow.lite.task.audio.classifier.AudioClassifier;
@@ -39,7 +40,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private TensorAudio tensorAudio;
     //var per temporizzare l' invio delle email
     private long lastCallTime = 0;
-    private static long MINUTES = 60 * 1000; // 5 minuti in millisecondi
+    private static long MINUTES = 60 * 1000; // minuti in millisecondi
 
     private String objectOfAudio;
     private String emailTo;
@@ -52,13 +53,20 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         emailTo = sharedPreferences.getString("email", "");
         MINUTES *= Integer.parseInt(sharedPreferences.getString("timeout", "1"));
-
         userClassification = new HashMap<String, Long>();
-        SettingsActivity settingsActivity = new SettingsActivity();
-        ArrayList<String> finalList = settingsActivity.getFinalListCategory();
-        for (String item : finalList) {
-            Log.i("FinalListCategory", item);
-            userClassification.put(item, 0L);
+
+        //prendiamo dalla sharedPrefence le categorie dell' utente
+        String userCategoriesSharedPreference = sharedPreferences.getString("UserCategories", "");
+        try {
+            Log.i("StringaRitorno" , userCategoriesSharedPreference);
+            JSONArray savedJsonArray = new JSONArray(userCategoriesSharedPreference);
+            //per ogni elemento in savedJsonArrayd
+            for (int i = 0; i < savedJsonArray.length(); i++) {
+                userClassification.put(savedJsonArray.getString(i), 0L);
+                Log.i("userClassification", savedJsonArray.getString(i));
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
 
         //inizialize audioClassifier from TF model
@@ -154,8 +162,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
 
                 userClassification.replace(subject, currentTime);
             }
-
-
         } else {
             // La funzione non può essere chiamata perché sono passati meno di 5 minuti
             Log.i(TAG, "EMAIL TIMEOUT NON ANCORA TERMINATO");
