@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +36,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextName, editTextSurname, editTextTimeout;
     private Button buttonSubmit;
+    private Button buttonReset;
     private String email;
     private String name;
     private String surname;
@@ -54,12 +56,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         //get all classification from yamnet.json file
         String[] yamnetClassArray = fromJSONToArray("yamnet_class_map.json");
-        for (String yamnetClass : yamnetClassArray) {
-            Log.i("YamnetClass", yamnetClass);
-        }
         yamnetClassList.addAll(Arrays.asList(yamnetClassArray));
+        Collections.sort(yamnetClassList);
+
+        //TODO memorizzare lista di categorie su shared preference
+
         Spinner spinner = findViewById(R.id.spinnerCategory);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, yamnetClassArray);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, yamnetClassList);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -89,6 +92,7 @@ public class SettingsActivity extends AppCompatActivity {
         editTextSurname = findViewById(R.id.editTextSurname);
         editTextTimeout = findViewById(R.id.editTextTimeOutEmail);
         buttonSubmit = findViewById(R.id.buttonSubmit);
+        buttonReset = findViewById(R.id.bttReset);
 
         sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         email = sharedPreferences.getString("email", "");
@@ -131,8 +135,24 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         });
+
+        buttonReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                yamnetClassList.addAll(finalListCategory);
+                Collections.sort(yamnetClassList);
+                finalListCategory.clear();
+
+            }
+
+        });
+
+
+
+
     }
 
+    
     public void onGoToAudioClassificationActivity(View view){
         // start the audio helper activity
         Intent intent = new Intent(this, AudioClassificationAcitvity.class);
@@ -188,6 +208,8 @@ public class SettingsActivity extends AppCompatActivity {
     public ArrayList<String> getFinalListCategory() {
         return finalListCategory;
     }
+    
+
 
 
 }
