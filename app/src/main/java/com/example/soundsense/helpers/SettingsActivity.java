@@ -54,6 +54,9 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        //load data from sharedPreference
+        sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+
         //initialize UI objects
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextName = findViewById(R.id.editTextName);
@@ -62,13 +65,15 @@ public class SettingsActivity extends AppCompatActivity {
         buttonSubmit = findViewById(R.id.buttonSubmit);
         buttonReset = findViewById(R.id.bttReset);
 
-        //load data from sharedPreference
-        sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+        String userCategories = sharedPreferences.getString("UserCategories", "");
+        if(userCategories.equals(""))
+            buttonReset.setEnabled(false);
 
-        String loadedYamnetFromSharedPref = sharedPreferences.getString("allYamnetCategories", "");
 
         //check if we didnt loaded already yamnet categories
+        String loadedYamnetFromSharedPref = sharedPreferences.getString("allYamnetCategories", "");
         if(loadedYamnetFromSharedPref.equals("")){
+
             //get all classification from yamnet.json file
             String[] yamnetClassArray = fromJSONToArray("short_yamnet_class_map.json");
             yamnetClassList.addAll(Arrays.asList(yamnetClassArray));
@@ -81,8 +86,10 @@ public class SettingsActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("allYamnetCategories", arrayString);
             editor.apply();
+
         } else {
             try {
+
                 // Converti la stringa dell'array in un JSONArray
                 JSONArray savedJsonArray = new JSONArray(loadedYamnetFromSharedPref);
                 Log.i("savedJsonArray", savedJsonArray.toString());
@@ -96,11 +103,6 @@ public class SettingsActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-
-        //se esistono sharedPreference gategory
-        if(!sharedPreferences.getString("UserCategories", "").equals("")){
-            //se troviamo usercategory allora carichiamo questo
         }
 
         //load the data from yamnetClassList into the Spinner
@@ -139,6 +141,9 @@ public class SettingsActivity extends AppCompatActivity {
                     editor = sharedPreferences.edit();
                     editor.putString("UserCategories", arrayString);
                     editor.apply();
+
+                    //enabling reset button for categories
+                    buttonReset.setEnabled(true);
                 }
             }
 
@@ -196,10 +201,31 @@ public class SettingsActivity extends AppCompatActivity {
         buttonReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO AGGIORNARE LA LOGICA RESET CON SHARED PREFERENCE
-                yamnetClassList.addAll(finalListCategory);
+                //grab UserCategories from sharedPref
+                String userCategories = sharedPreferences.getString("UserCategories", "");
+                JSONArray savedJsonArray = null;
+                try {
+                    savedJsonArray = new JSONArray(userCategories);
+                    Log.i("userCategories", savedJsonArray.toString());
+                    //for each userCategory, insert it into the yamnetClassList
+                    for (int i = 0; i < savedJsonArray.length(); i++) {
+                        yamnetClassList.add(savedJsonArray.getString(i));
+                        Log.i("YAMNETELSE", savedJsonArray.getString(i));
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                //sorting output
                 Collections.sort(yamnetClassList);
+
+                //cleaning both arrays
                 finalListCategory.clear();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("UserCategories", "");
+                editor.apply();
+
+                //disable the button reset
+                buttonReset.setEnabled(false);
             }
         });
     }
@@ -259,8 +285,4 @@ public class SettingsActivity extends AppCompatActivity {
     public ArrayList<String> getFinalListCategory() {
         return finalListCategory;
     }
-    
-
-
-
 }
