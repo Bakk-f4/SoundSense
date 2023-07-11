@@ -43,7 +43,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private static long MINUTES = 60 * 1000; // minuti in millisecondi
 
     private String objectOfAudio;
-    private String emailTo;
+    private String emailTo, userName, emailBody, eventTime;
     private HashMap<String, Long> userClassification;
 
     @Override
@@ -52,6 +52,8 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         emailTo = sharedPreferences.getString("email", "");
+        userName = sharedPreferences.getString("name", "utente");
+
         MINUTES *= Integer.parseInt(sharedPreferences.getString("timeout", "1"));
         userClassification = new HashMap<String, Long>();
 
@@ -96,7 +98,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 tensorAudio.load(audioRecord);
                 List<Classifications> output = audioClassifier.classify(tensorAudio);
 
-                String categoryLabel;
+                String categoryLabel = "";
 
                 //filtering out classifications with low probability
                 List<Category> finalOutput = new ArrayList<>();
@@ -104,12 +106,11 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                     for (Category category : classifications.getCategories()){
                         //if score is higher than 30% possibility...
                         categoryLabel = category.getLabel();
-                        if(category.getScore() > 0.3f && userClassification.get(categoryLabel)!=null){
+                        if(category.getScore() > 0.3f && userClassification.get(categoryLabel) != null){
                             finalOutput.add(category);
                             objectOfAudio = categoryLabel;
-                            sendEmail(emailTo,
-                                    categoryLabel,
-                                    "Yes, it's working well\nI will use it always.");
+                            eventTime = getCurrentDateTime();
+                            sendEmail(categoryLabel);
                         }
                     }
                 }
@@ -118,7 +119,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 StringBuilder outputStr = new StringBuilder();
                 for(Category category : finalOutput){
                     outputStr.append(category.getLabel())
-                            .append(": ").append(getCurrentDateTime()).append("\n");
+                            .append(": ").append(eventTime).append("\n");
                     Log.i(TAG, outputStr.toString());
                 }
 
@@ -144,34 +145,40 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord.stop();
     }
 
-    public void sendEmail(String sendTo, String subject, String message){
+    //TODO pensare meglio come gestire le categorie dell utente
+    // reset delle sharedPrefence?
+
+    public void sendEmail(String category){
+
+        String emailSubject = "Sound Sense:  " + category;
+
+        String emailBody = "Ciao, " + userName +
+                "\n\nAbbiamo rilevato un evento audio: " + category +
+                " alle ore: " + eventTime;
 
         long currentTime = System.currentTimeMillis();
-        if ((currentTime - userClassification.get(subject)) > MINUTES) {
+        if ((currentTime - userClassification.get(category)) > MINUTES) {
             SendMail mail = new SendMail(
                     "gruppo.cinque.webd@gmail.com",
                     "daugjanscvsqdrab",
-                    sendTo,
-                    subject,
-                    message
+                    emailTo,
+                    emailSubject,
+                    emailBody
             );
             mail.execute();
             // Aggiorna il tempo dell'ultima chiamata
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Log.i("valore timestamp prima: ", userClassification.get(subject)+"");
-
-                userClassification.replace(subject, currentTime);
+                userClassification.replace(category, currentTime);
             }
         } else {
             // La funzione non può essere chiamata perché sono passati meno di 5 minuti
             Log.i(TAG, "EMAIL TIMEOUT NON ANCORA TERMINATO");
-            Log.i(TAG, (currentTime - userClassification.get(subject) > MINUTES) +"");
-
+            Log.i(TAG, (currentTime - userClassification.get(category) > MINUTES) +"");
         }
     }
 
     public String getCurrentDateTime() {
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
     }
