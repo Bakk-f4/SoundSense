@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,12 +36,10 @@ import java.util.regex.Pattern;
 public class SettingsActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextName, editTextSurname, editTextTimeout;
-    private Button buttonSubmit;
-    private Button buttonReset;
-    private String email;
-    private String name;
-    private String surname;
-    private String timeout;
+    private static Switch switchSendEmail;
+    private static Switch switchSendNotification;
+    private Button buttonSubmit, buttonReset;
+    private String email, name, surname, timeout;
     private SharedPreferences sharedPreferences;
     private  ArrayAdapter<String> adapter;
     private static ArrayList<String> finalListCategory = new ArrayList<>();
@@ -64,6 +63,8 @@ public class SettingsActivity extends AppCompatActivity {
         editTextTimeout = findViewById(R.id.editTextTimeOutEmail);
         buttonSubmit = findViewById(R.id.buttonSubmit);
         buttonReset = findViewById(R.id.bttReset);
+        switchSendEmail = findViewById(R.id.switchEmail);
+        switchSendNotification = findViewById(R.id.switchNotification);
 
         String userCategories = sharedPreferences.getString("UserCategories", "");
         if(userCategories.equals(""))
@@ -162,6 +163,8 @@ public class SettingsActivity extends AppCompatActivity {
         editTextName.setText(name);
         editTextSurname.setText(surname);
         editTextTimeout.setText(timeout);
+        switchSendEmail.setChecked(sharedPreferences.getBoolean("checkEmail", false));
+        switchSendNotification.setChecked(sharedPreferences.getBoolean("checkNotification", false));
 
 
         //when user send the input data with buttonSubmit
@@ -189,6 +192,8 @@ public class SettingsActivity extends AppCompatActivity {
                     editor.putString("surname", surname);
                     editor.putString("email", email);
                     editor.putString("timeout", timeout);
+                    editor.putBoolean("checkEmail", switchSendEmail.isChecked());
+                    editor.putBoolean("checkNotification", switchSendNotification.isChecked());
                     editor.apply();
 
                     Toast.makeText(SettingsActivity.this, "Ready to start", Toast.LENGTH_LONG).show();
@@ -285,4 +290,5 @@ public class SettingsActivity extends AppCompatActivity {
     public ArrayList<String> getFinalListCategory() {
         return finalListCategory;
     }
+
 }

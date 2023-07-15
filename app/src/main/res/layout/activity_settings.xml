@@ -1,8 +1,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:appcompat="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:appcompat="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <Spinner
         android:id="@+id/spinnerCategory"
@@ -14,7 +14,7 @@
         app:layout_constraintHorizontal_bias="0.054"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextTimeOutEmail"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.417" />
 
     <EditText
         android:id="@+id/editTextEmail"
@@ -110,12 +110,50 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="36dp"
-        android:layout_marginBottom="96dp"
-        android:text="Reset"
+        android:layout_marginBottom="144dp"
         android:onClick="resetList"
+        android:text="Reset"
         app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.02"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/spinnerCategory" />
+
+    <Switch
+        android:id="@+id/switchEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Email notification"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.062"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerCategory"
+        app:layout_constraintVertical_bias="0.477" />
+
+    <Switch
+        android:id="@+id/switchNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Notification"
+        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.867"
+        app:layout_constraintStart_toEndOf="@+id/switchEmail"
+        app:layout_constraintTop_toBottomOf="@+id/bttReset"
+        app:layout_constraintVertical_bias="0.401" />
+
+    <TextView
+        android:id="@+id/tvContactBy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contact by:"
+        app:layout_constraintBottom_toTopOf="@+id/switchEmail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.046"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerCategory"
+        app:layout_constraintVertical_bias="0.666" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

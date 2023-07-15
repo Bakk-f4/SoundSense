@@ -1,7 +1,5 @@
 package com.example.soundsense;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,10 +8,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.soundsense.audio.AudioClassificationAcitvity;
 import com.example.soundsense.helpers.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    //TODO IMPLEMENTARE APPLICAZIONE CHE GIRA CON IL TELEFONO BLOCCATO
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

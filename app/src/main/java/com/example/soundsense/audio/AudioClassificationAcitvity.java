@@ -3,9 +3,7 @@ package com.example.soundsense.audio;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioRecord;
@@ -74,7 +72,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         //prendiamo dalla sharedPrefence le categorie dell' utente
         String userCategoriesSharedPreference = sharedPreferences.getString("UserCategories", "");
         try {
-            Log.i("StringaRitorno" , userCategoriesSharedPreference);
+            Log.i("StringaRitorno", userCategoriesSharedPreference);
             JSONArray savedJsonArray = new JSONArray(userCategoriesSharedPreference);
             //per ogni elemento in savedJsonArrayd
             for (int i = 0; i < savedJsonArray.length(); i++) {
@@ -88,7 +86,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         //inizialize audioClassifier from TF model
         try {
             audioClassifier = AudioClassifier.createFromFile(this, model);
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -106,6 +104,8 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord = audioClassifier.createAudioRecord();
         audioRecord.startRecording();
 
+        SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
+
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -116,21 +116,26 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
 
                 //filtering out classifications with low probability
                 List<Category> finalOutput = new ArrayList<>();
-                for (Classifications classifications : output){
-                    for (Category category : classifications.getCategories()){
+                for (Classifications classifications : output) {
+                    for (Category category : classifications.getCategories()) {
                         //if score is higher than 30% possibility...
                         categoryLabel = category.getLabel();
-                        if(category.getScore() > 0.3f && userClassification.get(categoryLabel) != null){
+                        if (category.getScore() > 0.3f && userClassification.get(categoryLabel) != null) {
                             finalOutput.add(category);
                             objectOfAudio = categoryLabel;
                             eventTime = getCurrentDateTime();
 
-                            // TODO IMPLEMENTARE CONDIZIONE DAL MENU IMPOSTAZIONI
                             //se il tempo di attesa selezionato e' passato...
-                            if(checkTime(categoryLabel)){
-                                sendEmail(categoryLabel);
-                                myMessage("Abbiamo rilevato un evento audio: " + categoryLabel, category.getIndex());
-                                Log.i("category.getIndex()", "" + category.getIndex());
+                            if (checkTime(categoryLabel)) {
+
+                                if (sharedPreferences.getBoolean("checkEmail", false)) {
+                                    sendEmail(categoryLabel);
+                                }
+                                if (sharedPreferences.getBoolean("checkNotification", false)) {
+                                    myMessage("Abbiamo rilevato un evento audio: " + categoryLabel, category.getIndex());
+                                    Log.i("category.getIndex()", "" + category.getIndex());
+                                }
+
                             }
 
                         }
@@ -139,7 +144,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
 
                 //Creating a multiline string with the filtered results
                 StringBuilder outputStr = new StringBuilder();
-                for(Category category : finalOutput){
+                for (Category category : finalOutput) {
                     outputStr.append(category.getLabel())
                             .append(": ").append(eventTime).append("\n");
                     Log.i(TAG, outputStr.toString());
@@ -149,7 +154,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(finalOutput.isEmpty())
+                        if (finalOutput.isEmpty())
                             tvOutput.setText("Could not classify audio");
                         tvOutput.setText(outputStr.toString());
                     }
@@ -167,7 +172,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord.stop();
     }
 
-    public void sendEmail(String category){
+    public void sendEmail(String category) {
 
         String emailSubject = "Sound Sense:  " + category;
 
@@ -210,6 +215,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
 
     private void myMessage(String message, Integer notificationId) {
 
+        Log.i("MyMessage", "INIZIOMETODO");
         // Creazione della notifica
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ASNotificationID")
                 .setSmallIcon(R.drawable.ic_notification)
@@ -218,13 +224,9 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
 
-        //redirezione click su notifica
-        Intent intent = new Intent(this, AudioClassificationAcitvity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pendingIntent);
-
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
+        // notificationId is a unique int for each notification that you must define
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -235,8 +237,8 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        // notificationId is a unique int for each notification that you must define
         notificationManager.notify(notificationId, builder.build());
+        Log.i("MyMessage", "FINEMETODO");
     }
 
     public Boolean checkTime(String category){
