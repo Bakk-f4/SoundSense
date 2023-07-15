@@ -46,4 +46,7 @@ dependencies {
     //testing email library
     implementation 'com.github.1902shubh:SendMail:1.0.0'
 
+    //for notification
+    implementation "androidx.core:core:1.6.0"
+
 }

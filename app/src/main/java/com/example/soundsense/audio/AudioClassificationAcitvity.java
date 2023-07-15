@@ -1,13 +1,24 @@
 package com.example.soundsense.audio;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.AudioRecord;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
+import com.example.soundsense.R;
 import com.example.soundsense.helpers.AudioHelperActivity;
 
 import org.json.JSONArray;
@@ -49,6 +60,9 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //creazione canale comunicazione per notifiche
+        createNotificationChannel();
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         emailTo = sharedPreferences.getString("email", "");
@@ -110,7 +124,15 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                             finalOutput.add(category);
                             objectOfAudio = categoryLabel;
                             eventTime = getCurrentDateTime();
-                            sendEmail(categoryLabel);
+
+                            // TODO IMPLEMENTARE CONDIZIONE DAL MENU IMPOSTAZIONI
+                            //se il tempo di attesa selezionato e' passato...
+                            if(checkTime(categoryLabel)){
+                                sendEmail(categoryLabel);
+                                myMessage("Abbiamo rilevato un evento audio: " + categoryLabel, category.getIndex());
+                                Log.i("category.getIndex()", "" + category.getIndex());
+                            }
+
                         }
                     }
                 }
@@ -145,9 +167,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         audioRecord.stop();
     }
 
-    //TODO pensare meglio come gestire le categorie dell utente
-    // reset delle sharedPrefence?
-
     public void sendEmail(String category){
 
         String emailSubject = "Sound Sense:  " + category;
@@ -156,30 +175,82 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 "\n\nAbbiamo rilevato un evento audio: " + category +
                 " alle ore: " + eventTime;
 
-        long currentTime = System.currentTimeMillis();
-        if ((currentTime - userClassification.get(category)) > MINUTES) {
-            SendMail mail = new SendMail(
-                    "gruppo.cinque.webd@gmail.com",
-                    "daugjanscvsqdrab",
-                    emailTo,
-                    emailSubject,
-                    emailBody
-            );
-            mail.execute();
-            // Aggiorna il tempo dell'ultima chiamata
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                userClassification.replace(category, currentTime);
-            }
-        } else {
-            // La funzione non può essere chiamata perché sono passati meno di 5 minuti
-            Log.i(TAG, "EMAIL TIMEOUT NON ANCORA TERMINATO");
-            Log.i(TAG, (currentTime - userClassification.get(category) > MINUTES) +"");
-        }
+        SendMail mail = new SendMail(
+                "gruppo.cinque.webd@gmail.com",
+                "daugjanscvsqdrab",
+                emailTo,
+                emailSubject,
+                emailBody
+        );
+        mail.execute();
     }
 
     public String getCurrentDateTime() {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "ASNotificationN"; //getString(R.string.channel_name);
+            String description = "ASNotificationD"; //getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("ASNotificationID", name, importance);
+            channel.setDescription(description);
+            channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void myMessage(String message, Integer notificationId) {
+
+        // Creazione della notifica
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ASNotificationID")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("AudioSense")
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+
+        //redirezione click su notifica
+        Intent intent = new Intent(this, AudioClassificationAcitvity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(notificationId, builder.build());
+    }
+
+    public Boolean checkTime(String category){
+        long currentTime = System.currentTimeMillis();
+        if ((currentTime - userClassification.get(category)) > MINUTES) {
+            // Aggiorna il tempo dell'ultima chiamata
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                userClassification.replace(category, currentTime);
+            }
+            return true;
+        }
+        // La funzione non può essere chiamata perché sono passati meno di 5 minuti
+        Log.i(TAG, "EMAIL TIMEOUT NON ANCORA TERMINATO");
+        Log.i(TAG, (currentTime - userClassification.get(category) > MINUTES) +"");
+        return false;
     }
 }
