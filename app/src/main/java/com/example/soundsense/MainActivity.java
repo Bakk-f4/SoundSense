@@ -15,8 +15,6 @@ import com.example.soundsense.helpers.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    //TODO IMPLEMENTARE APPLICAZIONE CHE GIRA CON IL TELEFONO BLOCCATO
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +39,5 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         Log.i("mail is set", sharedPreferences.getString("email", ""));
         return !sharedPreferences.getString("email", "").equals("");
-
     }
-
-
 }

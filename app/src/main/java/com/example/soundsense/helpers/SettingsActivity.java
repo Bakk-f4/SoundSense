@@ -76,7 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
         if(loadedYamnetFromSharedPref.equals("")){
 
             //get all classification from yamnet.json file
-            String[] yamnetClassArray = fromJSONToArray("short_yamnet_class_map.json");
+            String[] yamnetClassArray = fromJSONToArray("short_list_category.json");
             yamnetClassList.addAll(Arrays.asList(yamnetClassArray));
             Collections.sort(yamnetClassList);
 
@@ -91,11 +91,10 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             try {
 
-                // Converti la stringa dell'array in un JSONArray
+                // Convert string from array into JSONArray
                 JSONArray savedJsonArray = new JSONArray(loadedYamnetFromSharedPref);
                 Log.i("savedJsonArray", savedJsonArray.toString());
 
-                //per ogni elemento in savedJsonArray
                 for (int i = 0; i < savedJsonArray.length(); i++) {
                     yamnetClassList.add(savedJsonArray.getString(i));
                     Log.i("YAMNETELSE", savedJsonArray.getString(i));
@@ -116,7 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (id != 0) {
-                    // Rimuovi l'elemento dalla lista temporanea
+                    //remove the element from the temp list
                     String selectedItem = (String) parent.getItemAtPosition(position);
                     yamnetClassList.remove(selectedItem);
 
@@ -129,14 +128,14 @@ public class SettingsActivity extends AppCompatActivity {
                     editor.putString("allYamnetCategories", arrayString);
                     editor.apply();
 
-                    // Imposta il nuovo adapter
+                    // set new adapter
                     ArrayAdapter<String> newAdapter = new ArrayAdapter<>(SettingsActivity.this, android.R.layout.simple_spinner_dropdown_item, yamnetClassList);
                     spinner.setAdapter(newAdapter);
 
-                    // Aggiungi l'elemento alla lista "finalListCategory"
+                    // add element to list "finalListCategory"
                     finalListCategory.add(selectedItem);
 
-                    //inseriamo finalListCategory alle sharedPreference
+                    //insert finalListCategory to sharedPreference
                     jsonArray = new JSONArray(finalListCategory);
                     arrayString = jsonArray.toString();
                     editor = sharedPreferences.edit();
@@ -150,7 +149,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Nessuna selezione effettuata
+                // nothing selected...
             }
         });
 
@@ -186,7 +185,7 @@ public class SettingsActivity extends AppCompatActivity {
                 if (email.isEmpty() || timeout.isEmpty()) {
                     Toast.makeText(SettingsActivity.this, "Inserisci tutti i campi", Toast.LENGTH_SHORT).show();
                 } else {
-                    //memorizzo le preferenze del client in modo permanente
+                    //save the preference of user in the shared preferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("name", name);
                     editor.putString("surname", surname);
@@ -196,7 +195,6 @@ public class SettingsActivity extends AppCompatActivity {
                     editor.putBoolean("checkNotification", switchSendNotification.isChecked());
                     editor.apply();
 
-                    Toast.makeText(SettingsActivity.this, "Ready to start", Toast.LENGTH_LONG).show();
                     onGoToAudioClassificationActivity(v);
                 }
             }
@@ -284,11 +282,6 @@ public class SettingsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return ret;
-    }
-
-    //get the finalListCategory
-    public ArrayList<String> getFinalListCategory() {
-        return finalListCategory;
     }
 
 }

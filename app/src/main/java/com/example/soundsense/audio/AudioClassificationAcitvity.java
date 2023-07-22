@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -47,21 +48,18 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     private TimerTask timerTask;
     private AudioClassifier audioClassifier;
     private TensorAudio tensorAudio;
-    //var per temporizzare l' invio delle email
-    private long lastCallTime = 0;
     private static long MINUTES = 60 * 1000; // minuti in millisecondi
-
-    private String objectOfAudio;
-    private String emailTo, userName, emailBody, eventTime;
+    private String emailTo, userName, eventTime;
     private HashMap<String, Long> userClassification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //creazione canale comunicazione per notifiche
+        //create notification channel
         createNotificationChannel();
 
+        //loading shared preferences
         SharedPreferences sharedPreferences = getSharedPreferences("UserData", Context.MODE_PRIVATE);
         emailTo = sharedPreferences.getString("email", "");
         userName = sharedPreferences.getString("name", "utente");
@@ -70,37 +68,38 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
         userClassification = new HashMap<String, Long>();
 
         //prendiamo dalla sharedPrefence le categorie dell' utente
+        //get from shared preferences user categories
         String userCategoriesSharedPreference = sharedPreferences.getString("UserCategories", "");
-        try {
-            Log.i("StringaRitorno", userCategoriesSharedPreference);
-            JSONArray savedJsonArray = new JSONArray(userCategoriesSharedPreference);
-            //per ogni elemento in savedJsonArrayd
-            for (int i = 0; i < savedJsonArray.length(); i++) {
-                userClassification.put(savedJsonArray.getString(i), 0L);
-                Log.i("userClassification", savedJsonArray.getString(i));
+        if(userCategoriesSharedPreference.equals("")){
+            Toast.makeText(this, "You must select categories!", Toast.LENGTH_LONG).show();
+        } else {
+            try {
+                Log.i("StringaRitorno", userCategoriesSharedPreference);
+                JSONArray savedJsonArray = new JSONArray(userCategoriesSharedPreference);
+                //per ogni elemento in savedJsonArrayd
+                for (int i = 0; i < savedJsonArray.length(); i++) {
+                    userClassification.put(savedJsonArray.getString(i), 0L);
+                    Log.i("userClassification", savedJsonArray.getString(i));
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
             }
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
 
-        //inizialize audioClassifier from TF model
-        try {
-            audioClassifier = AudioClassifier.createFromFile(this, model);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            //inizialize audioClassifier from TF model
+            try {
+                audioClassifier = AudioClassifier.createFromFile(this, model);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        //inizialize audio recorder for classifying audio
-        tensorAudio = audioClassifier.createInputTensorAudio();
+            //inizialize audio recorder for classifying audio
+            tensorAudio = audioClassifier.createInputTensorAudio();
+        }
     }
 
     @Override
     public void startRecording(View view) {
         super.startRecording(view);
-        TensorAudio.TensorAudioFormat format = audioClassifier.getRequiredTensorAudioFormat();
-        String specs = "Number of channels: " + format.getChannels() + "\n" +
-                "Sample Rate: " + format.getSampleRate();
-        tvSpecs.setText(specs);
         audioRecord = audioClassifier.createAudioRecord();
         audioRecord.startRecording();
 
@@ -120,12 +119,12 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                     for (Category category : classifications.getCategories()) {
                         //if score is higher than 30% possibility...
                         categoryLabel = category.getLabel();
+                        if(category.getScore() > 0.3f)
+                            Log.i("CategorieValutate", categoryLabel);
                         if (category.getScore() > 0.3f && userClassification.get(categoryLabel) != null) {
                             finalOutput.add(category);
-                            objectOfAudio = categoryLabel;
                             eventTime = getCurrentDateTime();
-
-                            //se il tempo di attesa selezionato e' passato...
+                            //if waiting time is done
                             if (checkTime(categoryLabel)) {
 
                                 if (sharedPreferences.getBoolean("checkEmail", false)) {
@@ -135,9 +134,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                                     myMessage("Abbiamo rilevato un evento audio: " + categoryLabel, category.getIndex());
                                     Log.i("category.getIndex()", "" + category.getIndex());
                                 }
-
                             }
-
                         }
                     }
                 }
@@ -162,7 +159,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
             }
         };
         //after 1 second it start and every 0.5 second will classify audio
-        new Timer().scheduleAtFixedRate(timerTask, 1, 500);
+        new Timer().scheduleAtFixedRate(timerTask, 0, 100);
     }
 
     @Override
@@ -214,9 +211,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     }
 
     private void myMessage(String message, Integer notificationId) {
-
-        Log.i("MyMessage", "INIZIOMETODO");
-        // Creazione della notifica
+        // Create the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ASNotificationID")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("AudioSense")
@@ -238,7 +233,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
             return;
         }
         notificationManager.notify(notificationId, builder.build());
-        Log.i("MyMessage", "FINEMETODO");
     }
 
     public Boolean checkTime(String category){
