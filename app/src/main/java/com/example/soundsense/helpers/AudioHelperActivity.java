@@ -17,7 +17,7 @@ import com.example.soundsense.R;
 public class AudioHelperActivity extends AppCompatActivity {
 
     protected TextView tvOutput;
-    protected TextView tvSpecs;
+    //protected TextView tvSpecs;
     protected Button bttStartRecording;
     protected Button bttStopRecording;
     protected ImageButton bttSettings;
@@ -29,7 +29,7 @@ public class AudioHelperActivity extends AppCompatActivity {
         setContentView(R.layout.activity_audio_helper);
 
         tvOutput = findViewById(R.id.tvAudioOutput);
-        tvSpecs = findViewById(R.id.tvAudioSpecs);
+        //tvSpecs = findViewById(R.id.tvAudioSpecs);
         bttStartRecording = findViewById(R.id.bttStartRecording);
         bttStopRecording = findViewById(R.id.bttStopRecording);
         bttSettings = findViewById(R.id.bttSettings);

@@ -1,159 +1,136 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:appcompat="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:orientation="vertical">
 
-    <Spinner
-        android:id="@+id/spinnerCategory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="108dp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.054"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTimeOutEmail"
-        app:layout_constraintVertical_bias="0.417" />
-
-    <EditText
-        android:id="@+id/editTextEmail"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Email*"
-        app:layout_constraintBottom_toTopOf="@+id/editTextName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintEnd_toEndOf="parent"
-        appcompat:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/editTextName"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Nome"
-        app:layout_constraintBottom_toTopOf="@+id/editTextSurname"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintEnd_toEndOf="parent"
-        appcompat:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintTop_toBottomOf="@id/editTextEmail" />
-
-    <EditText
-        android:id="@+id/editTextSurname"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Cognome"
-        app:layout_constraintBottom_toTopOf="@+id/editTextTimeOutEmail"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintEnd_toEndOf="parent"
-        appcompat:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintTop_toBottomOf="@id/editTextName" />
-
-    <EditText
-        android:id="@+id/editTextTimeOutEmail"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="167dp"
-        android:hint="Timeout*"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintEnd_toEndOf="parent"
-        appcompat:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintTop_toBottomOf="@id/editTextSurname" />
-
-    <Button
-        android:id="@+id/buttonSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onGoToAudioClassificationActivity"
-        android:text="Continua"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintEnd_toEndOf="parent"
-        appcompat:layout_constraintStart_toStartOf="parent"
-        appcompat:layout_constraintTop_toBottomOf="@id/editTextTimeOutEmail" />
 
     <TextView
         android:id="@+id/tvSettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center|center_horizontal"
+        android:layout_marginTop="30dp"
         android:text="Settings"
-        android:textSize="34sp"
-        app:layout_constraintBottom_toTopOf="@+id/editTextEmail"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25" />
+        android:textSize="34sp" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="All field with * are required"
-        app:layout_constraintBottom_toTopOf="@+id/editTextEmail"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:text="All field with * are required" />
 
-    <Button
-        android:id="@+id/bttReset"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginBottom="144dp"
-        android:onClick="resetList"
-        android:text="Reset"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/spinnerCategory" />
+        android:layout_marginTop="20dp"
+        android:hint="Email*" />
 
-    <Switch
-        android:id="@+id/switchEmail"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:checked="false"
-        android:text="Email notification"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.062"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerCategory"
-        app:layout_constraintVertical_bias="0.477" />
+        android:layout_marginTop="10dp"
+        android:hint="Nome" />
 
-    <Switch
-        android:id="@+id/switchNotification"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/editTextSurname"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:checked="false"
-        android:text="Notification"
-        app:layout_constraintBottom_toTopOf="@+id/buttonSubmit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.867"
-        app:layout_constraintStart_toEndOf="@+id/switchEmail"
-        app:layout_constraintTop_toBottomOf="@+id/bttReset"
-        app:layout_constraintVertical_bias="0.401" />
+        android:layout_marginTop="10dp"
+        android:hint="Cognome" />
+
+    <EditText
+        android:id="@+id/editTextTimeOutEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="Timeout*" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp" />
+
+
+        <Button
+            android:id="@+id/bttReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:onClick="resetList"
+            android:text="Reset"
+            app:cornerRadius="30dp" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvContactBy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Contact by:"
-        app:layout_constraintBottom_toTopOf="@+id/switchEmail"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.046"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerCategory"
-        app:layout_constraintVertical_bias="0.666" />
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:text="Contact by:" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Switch
+        android:id="@+id/switchEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:checked="false"
+        android:text="Email" />
+
+    <Switch
+        android:id="@+id/switchNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:checked="false"
+        android:text="Notification" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center|bottom"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/buttonSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:onClick="onGoToAudioClassificationActivity"
+            android:text="Continue"
+            app:cornerRadius="30dp" />
+
+    </LinearLayout>
+
+
+
+    <!--
+
+
+
+
+
+
+
+
+        -->
+
+</LinearLayout>

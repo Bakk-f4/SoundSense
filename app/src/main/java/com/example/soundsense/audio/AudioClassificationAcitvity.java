@@ -97,10 +97,10 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
     @Override
     public void startRecording(View view) {
         super.startRecording(view);
-        TensorAudio.TensorAudioFormat format = audioClassifier.getRequiredTensorAudioFormat();
-        String specs = "Number of channels: " + format.getChannels() + "\n" +
-                "Sample Rate: " + format.getSampleRate();
-        tvSpecs.setText(specs);
+        //TensorAudio.TensorAudioFormat format = audioClassifier.getRequiredTensorAudioFormat();
+        //String specs = "Number of channels: " + format.getChannels() + "\n" +
+                //"Sample Rate: " + format.getSampleRate();
+        //tvSpecs.setText(specs);
         audioRecord = audioClassifier.createAudioRecord();
         audioRecord.startRecording();
 
@@ -135,9 +135,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                                     myMessage("Abbiamo rilevato un evento audio: " + categoryLabel, category.getIndex());
                                     Log.i("category.getIndex()", "" + category.getIndex());
                                 }
-
                             }
-
                         }
                     }
                 }
@@ -146,7 +144,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                 StringBuilder outputStr = new StringBuilder();
                 for (Category category : finalOutput) {
                     outputStr.append(category.getLabel())
-                            .append(": ").append(eventTime).append("\n");
+                            .append("\n").append(eventTime).append("");
                     Log.i(TAG, outputStr.toString());
                 }
 
@@ -159,6 +157,7 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                         tvOutput.setText(outputStr.toString());
                     }
                 });
+                tvOutput.setText(outputStr.toString());
             }
         };
         //after 1 second it start and every 0.5 second will classify audio

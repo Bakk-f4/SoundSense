@@ -6,23 +6,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".helpers.AudioHelperActivity">
+
+
     <ImageButton
         android:id="@+id/bttSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="101dp"
+        android:layout_height="88dp"
+        android:layout_margin="8dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="#00FFFFFF"
         android:onClick="onGoToSettings"
+        android:scaleX="2"
+        android:scaleY="2"
         android:src="@drawable/ic_action_name"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="8dp" />
-
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/bttStartRecording"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Recording"
+        android:layout_width="160dp"
+        android:layout_height="75dp"
+        android:layout_marginBottom="48dp"
         android:onClick="startRecording"
+        android:scaleX="1"
+        android:scaleY="1"
+        android:text="Start"
+        android:textSize="24sp"
+        app:cornerRadius="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/bttStopRecording"
         app:layout_constraintHorizontal_bias="0.5"
@@ -30,10 +40,15 @@
 
     <Button
         android:id="@+id/bttStopRecording"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop Recording"
+        android:layout_width="160dp"
+        android:layout_height="75dp"
+        android:layout_marginBottom="48dp"
         android:onClick="stopRecording"
+        android:scaleX="1"
+        android:scaleY="1"
+        android:text="Stop"
+        android:textSize="24sp"
+        app:cornerRadius="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -41,22 +56,18 @@
 
     <TextView
         android:id="@+id/tvAudioOutput"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:text="Output"
-        app:layout_constraintBottom_toTopOf="@+id/tvAudioSpecs"
+        android:layout_width="411dp"
+        android:layout_height="342dp"
+        android:text="SoundSense"
+        android:textAlignment="center"
+        android:textSize="48sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.665" />
 
-    <TextView
-        android:id="@+id/tvAudioSpecs"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="Specs"
-        app:layout_constraintBottom_toTopOf="@+id/bttStopRecording"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvAudioOutput" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
