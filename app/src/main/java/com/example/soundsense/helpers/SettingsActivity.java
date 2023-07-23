@@ -45,9 +45,6 @@ public class SettingsActivity extends AppCompatActivity {
     private static ArrayList<String> finalListCategory = new ArrayList<>();
     private ArrayList<String> yamnetClassList = new ArrayList<>();
 
-
-    //TODO CAMBIARE L USO DELLE LISTE, USARE SOLO JSONARRAY AL POSTO DI finalListCategory
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,19 +84,13 @@ public class SettingsActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("allYamnetCategories", arrayString);
             editor.apply();
-
         } else {
             try {
-
                 // Convert string from array into JSONArray
                 JSONArray savedJsonArray = new JSONArray(loadedYamnetFromSharedPref);
-                Log.i("savedJsonArray", savedJsonArray.toString());
-
                 for (int i = 0; i < savedJsonArray.length(); i++) {
                     yamnetClassList.add(savedJsonArray.getString(i));
-                    Log.i("YAMNETELSE", savedJsonArray.getString(i));
                 }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -146,7 +137,6 @@ public class SettingsActivity extends AppCompatActivity {
                     buttonReset.setEnabled(true);
                 }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // nothing selected...
@@ -164,7 +154,6 @@ public class SettingsActivity extends AppCompatActivity {
         editTextTimeout.setText(timeout);
         switchSendEmail.setChecked(sharedPreferences.getBoolean("checkEmail", false));
         switchSendNotification.setChecked(sharedPreferences.getBoolean("checkNotification", false));
-
 
         //when user send the input data with buttonSubmit
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
@@ -213,7 +202,6 @@ public class SettingsActivity extends AppCompatActivity {
                     //for each userCategory, insert it into the yamnetClassList
                     for (int i = 0; i < savedJsonArray.length(); i++) {
                         yamnetClassList.add(savedJsonArray.getString(i));
-                        Log.i("YAMNETELSE", savedJsonArray.getString(i));
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -275,7 +263,6 @@ public class SettingsActivity extends AppCompatActivity {
                 String displayName = jsonObject.getString("display_name");
                 ret[i] = displayName;
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -283,5 +270,4 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return ret;
     }
-
 }

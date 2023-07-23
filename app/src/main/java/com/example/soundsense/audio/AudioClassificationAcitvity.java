@@ -74,7 +74,6 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
             Toast.makeText(this, "You must select categories!", Toast.LENGTH_LONG).show();
         } else {
             try {
-                Log.i("StringaRitorno", userCategoriesSharedPreference);
                 JSONArray savedJsonArray = new JSONArray(userCategoriesSharedPreference);
                 //per ogni elemento in savedJsonArrayd
                 for (int i = 0; i < savedJsonArray.length(); i++) {
@@ -119,20 +118,16 @@ public class AudioClassificationAcitvity extends AudioHelperActivity {
                     for (Category category : classifications.getCategories()) {
                         //if score is higher than 30% possibility...
                         categoryLabel = category.getLabel();
-                        if(category.getScore() > 0.3f)
-                            Log.i("CategorieValutate", categoryLabel);
                         if (category.getScore() > 0.3f && userClassification.get(categoryLabel) != null) {
                             finalOutput.add(category);
                             eventTime = getCurrentDateTime();
                             //if waiting time is done
                             if (checkTime(categoryLabel)) {
-
                                 if (sharedPreferences.getBoolean("checkEmail", false)) {
                                     sendEmail(categoryLabel);
                                 }
                                 if (sharedPreferences.getBoolean("checkNotification", false)) {
                                     myMessage("Abbiamo rilevato un evento audio: " + categoryLabel, category.getIndex());
-                                    Log.i("category.getIndex()", "" + category.getIndex());
                                 }
                             }
                         }
